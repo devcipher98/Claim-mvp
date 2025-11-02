@@ -20,6 +20,7 @@ export default function Home() {
   const [useAgenticMode, setUseAgenticMode] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [processingSteps, setProcessingSteps] = useState<any[]>([]);
+  const [fileUploaded, setFileUploaded] = useState(false);
 
   const demoClaims = demoClaimsData as any[];
 
@@ -34,6 +35,7 @@ export default function Home() {
       setError('');
       setProcessingSteps([]);
       setCurrentStep(0);
+      setFileUploaded(false);
     }
   };
 
@@ -59,6 +61,7 @@ export default function Home() {
       setWorkflow(null);
       setProcessingSteps([]);
       setCurrentStep(0);
+      setFileUploaded(true);
     } catch (err) {
       setError('Failed to read file');
       console.error('File read error:', err);
@@ -131,106 +134,109 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">ClaimSense AI</h1>
-            <p className="text-gray-600 mt-1">
-              Healthcare billing assistant with AI-powered claim validation
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button asChild variant="outline" size="lg">
-              <Link href="/notes">Upload Notes</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/claims">View Claims</Link>
-            </Button>
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* Hero + Demo Split Section */}
+      <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white min-h-screen overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
         </div>
 
-        {/* Demo Selector */}
-        <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-gray-900">Demo Case</CardTitle>
-            <CardDescription className="text-sm text-gray-500">
-              Choose a pre-configured test case
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="demo-select">Select Case</Label>
-              <select
-                id="demo-select"
-                value={selectedDemo}
-                onChange={handleDemoSelect}
-                disabled={isProcessing}
-                className="flex h-9 w-full rounded-xl border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">-- Choose a demo case --</option>
-                {demoClaims.map((demo) => (
-                  <option key={demo.id} value={demo.id}>
-                    {demo.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {selectedDemo && (
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-2">
-                <p className="text-sm text-gray-700">
-                  <strong>Description:</strong> {demoClaims.find(d => d.id === selectedDemo)?.description}
-                </p>
-                <p className="text-sm text-gray-700">
-                  <strong>Issue:</strong> {demoClaims.find(d => d.id === selectedDemo)?.expected_issue}
-                </p>
+        <div className="relative max-w-7xl mx-auto px-8 py-12 lg:py-16">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Left: Hero Content */}
+            <div className="lg:sticky lg:top-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6 border border-white/20">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                <span>AI-Powered Healthcare Billing Automation</span>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Mode Toggle */}
-        <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">
-                  {useAgenticMode ? 'Agentic Mode' : 'Traditional Mode'}
-                </CardTitle>
-                <CardDescription className="text-sm text-gray-600 mt-1">
-                  {useAgenticMode 
-                    ? 'AI agent autonomously decides workflow via MCP protocol'
-                    : 'Follows predetermined workflow steps'
-                  }
-                </CardDescription>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={useAgenticMode}
-                  onChange={(e) => setUseAgenticMode(e.target.checked)}
-                  disabled={isProcessing}
-                  className="sr-only peer"
-                />
-                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
-                <span className="ms-3 text-sm font-medium text-gray-900">
-                  {useAgenticMode ? 'ON' : 'OFF'}
+              
+              <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                Automating CPT Coding &<br />
+                <span className="bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">
+                  Claims Drafting with AI
                 </span>
-              </label>
-            </div>
-          </CardHeader>
-        </Card>
+              </h1>
+              
+              <p className="text-lg lg:text-xl text-blue-100 mb-6 leading-relaxed">
+                From procedure to reimbursement — streamlined.
+              </p>
+              
+              <p className="text-base text-blue-200 mb-6">
+                Reduce billing costs by 50% while eliminating manual coding errors. 
+                Our AI agent automates the entire workflow: de-identification, CPT code selection, 
+                and claim drafting.
+              </p>
 
-        {/* Input Area */}
-        <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-          <CardHeader>
+              {/* HIPAA Compliance Badge */}
+              <div className="mb-8 flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div className="flex-shrink-0">
+                  <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="font-semibold text-white mb-1">HIPAA Compliant</div>
+                  <div className="text-sm text-blue-200">
+                    Patient data is protected with local de-identification. Your sensitive information never leaves your control.
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Stats - Compact */}
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl lg:text-3xl font-bold mb-1">$86</div>
+                  <div className="text-blue-200 text-xs">Saved per claim</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl lg:text-3xl font-bold mb-1">$860K</div>
+                  <div className="text-blue-200 text-xs">Annual savings</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl lg:text-3xl font-bold mb-1">3</div>
+                  <div className="text-blue-200 text-xs">Simple steps</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Demo Section */}
+            <div id="demo-section" className="lg:sticky lg:top-8">
+              <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6 lg:p-8">
+                {/* Section Header */}
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center gap-2 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent">
+                      Try It Live
+                    </h2>
+                  </div>
+                </div>
+
+                {/* Input Area - Compact */}
+                <Card className="bg-gradient-to-br from-white via-indigo-50/30 to-blue-50/30 border-2 border-indigo-200 shadow-xl rounded-2xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-4">
             <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">Clinician Note</CardTitle>
-                <CardDescription className="text-sm text-gray-500">
-                  Enter note or upload a .txt file (max 1MB)
+                          <CardTitle className="text-lg font-bold text-white">Clinician Note</CardTitle>
+                          <CardDescription className="text-blue-100 text-xs mt-0.5">
+                            Paste note or upload .txt file
                 </CardDescription>
+                        </div>
               </div>
               <Label htmlFor="file-upload" className="cursor-pointer">
                 <Input
@@ -241,42 +247,73 @@ export default function Home() {
                   disabled={isProcessing}
                   className="hidden"
                 />
-                <Button variant="outline" size="sm" type="button" disabled={isProcessing}>
-                  Upload File
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          type="button" 
+                          disabled={isProcessing}
+                          className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 hover:text-white h-8 text-xs px-3"
+                        >
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          Upload
                 </Button>
               </Label>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {clinicianNote && !selectedDemo && (
-              <div className="bg-green-50 border border-green-200 rounded-2xl p-3">
-                <span className="text-sm text-green-600 font-medium">File loaded</span>
+                  </div>
+                  <CardContent className="p-4 space-y-4">
+            {fileUploaded && clinicianNote && !selectedDemo && (
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-3 flex items-center gap-2">
+                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="font-semibold text-green-900 text-sm">File Loaded</div>
+                          <div className="text-xs text-green-700">Ready to process</div>
+                        </div>
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="clinician-note">Note Content</Label>
-              <textarea
+                      <Label htmlFor="clinician-note" className="text-xs font-semibold text-gray-700">
+                        Note Content
+                      </Label>
+                <textarea
                 id="clinician-note"
                 value={clinicianNote}
-                onChange={(e) => setClinicianNote(e.target.value)}
+                onChange={(e) => {
+                  setClinicianNote(e.target.value);
+                  setFileUploaded(false);
+                }}
                 disabled={isProcessing}
-                className="flex min-h-[160px] w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 font-mono"
-                placeholder="Enter clinician note here..."
+                        className="flex min-h-[150px] w-full rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 font-mono transition-all"
+                        placeholder="Paste your clinician note here..."
               />
             </div>
             <Button
               onClick={handleProcess}
               disabled={isProcessing || !clinicianNote.trim()}
-              className="w-full"
+                      className={`w-full h-12 rounded-lg text-base font-semibold shadow-lg transition-all ${
+                        isProcessing || !clinicianNote.trim()
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white hover:shadow-xl transform hover:-translate-y-0.5'
+                      }`}
               size="lg"
             >
               {isProcessing ? (
-                <span className="flex items-center gap-2">
+                        <span className="flex items-center justify-center gap-2">
                   <LoadingSpinner size="sm" />
-                  Processing...
+                          <span>Processing...</span>
                 </span>
               ) : (
-                'Process Claim'
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          Process Claim with AI
+                        </span>
               )}
             </Button>
           </CardContent>
@@ -284,7 +321,7 @@ export default function Home() {
 
         {/* Agentic Processing Indicator */}
         {isProcessing && useAgenticMode && (
-          <div className="animate-fade-in">
+                  <div className="mt-6 animate-fade-in">
             <AgentProcessor
               isProcessing={isProcessing}
               currentStep={currentStep}
@@ -297,7 +334,7 @@ export default function Home() {
 
         {/* Error Display */}
         {error && (
-          <Card className="bg-red-50 border-red-200 shadow-sm rounded-2xl">
+                  <Card className="mt-6 bg-red-50 border-red-200 shadow-sm rounded-2xl">
             <CardContent className="pt-6">
               <p className="text-red-800">{error}</p>
             </CardContent>
@@ -306,13 +343,13 @@ export default function Home() {
 
         {/* Results */}
         {workflow && !isProcessing && (
-          <div className="space-y-6">
+                  <div className="mt-6 space-y-4">
             {workflow.agenticMode && workflow.reasoning_chain && (
               <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl font-semibold text-gray-900">Agentic Processing Complete</CardTitle>
+                              <CardTitle className="text-lg font-semibold text-gray-900">Agentic Processing Complete</CardTitle>
                       <CardDescription className="text-sm text-gray-500 mt-1">
                         Completed {workflow.total_steps} steps in {workflow.duration_ms}ms
                       </CardDescription>
@@ -325,16 +362,16 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {workflow.reasoning_chain.map((step: any, idx: number) => (
-                    <div key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-200">
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                              <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs">
                         {idx + 1}
                       </div>
                       <div className="flex-1 space-y-2">
                         {step.reasoning && (
-                          <p className="text-sm text-gray-700">{step.reasoning}</p>
+                                  <p className="text-xs text-gray-700">{step.reasoning}</p>
                         )}
                         {step.tool && (
-                          <div className="bg-white rounded-xl p-2 border border-gray-200">
+                                  <div className="bg-white rounded-lg p-2 border border-gray-200">
                             <p className="text-xs font-medium text-gray-600">
                               Tool: <span className="font-mono text-blue-600">{step.tool}</span>
                             </p>
@@ -364,175 +401,491 @@ export default function Home() {
                 </CardContent>
               </Card>
             )}
-
-            {!workflow.agenticMode && (
-              <>
-                {/* Extracted Entities */}
-                <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-gray-900">1. Extracted Entities</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <pre className="bg-gray-50 p-4 rounded-xl overflow-x-auto text-sm border border-gray-200">
-                      {JSON.stringify(workflow.entities, null, 2)}
-                    </pre>
-                  </CardContent>
-                </Card>
-
-                {/* Mapped Codes */}
-                <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-gray-900">2. Mapped Codes</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="font-semibold text-gray-700 mb-2">CPT Codes:</h3>
-                      {workflow.mappedCodes.cpt_codes.map((code: any, idx: number) => (
-                        <div key={idx} className="bg-blue-50 p-3 rounded-2xl mb-2 border border-blue-200">
-                          <p className="font-mono font-bold">{code.code}</p>
-                          <p className="text-sm text-gray-600">{code.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Confidence: {(code.confidence * 100).toFixed(0)}% | Source: {code.source}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-700 mb-2">ICD-10 Codes:</h3>
-                      {workflow.mappedCodes.icd_codes.map((code: any, idx: number) => (
-                        <div key={idx} className="bg-green-50 p-3 rounded-2xl mb-2 border border-green-200">
-                          <p className="font-mono font-bold">{code.code}</p>
-                          <p className="text-sm text-gray-600">{code.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Confidence: {(code.confidence * 100).toFixed(0)}% | Source: {code.source}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Validation Results */}
-                <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-gray-900">3. Validation Results</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {workflow.validationResult.valid ? (
-                      <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
-                        <p className="text-green-800 font-semibold">Claim is valid</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {workflow.validationResult.issues.map((issue: any, idx: number) => (
-                          <div
-                            key={idx}
-                            className={`p-4 rounded-2xl border ${
-                              issue.severity === 'error'
-                                ? 'bg-red-50 border-red-200'
-                                : 'bg-amber-50 border-amber-200'
-                            }`}
-                          >
-                            <p className="font-semibold">
-                              {issue.severity.toUpperCase()}: {issue.message}
-                            </p>
-                            {issue.suggested_fix && (
-                              <p className="text-sm mt-1">Suggested Fix: {issue.suggested_fix}</p>
-                            )}
-                            {issue.rule_reference && (
-                              <p className="text-xs text-gray-600 mt-1">
-                                Reference: {issue.rule_reference}
-                              </p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* AI Fixes */}
-                {workflow.fixResult && (
-                  <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-semibold text-gray-900">4. AI-Generated Fixes</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {workflow.fixResult.fixes_applied.map((fix: any, idx: number) => (
-                        <div key={idx} className="bg-blue-50 p-4 rounded-2xl border border-blue-200">
-                          <p className="font-semibold text-blue-900">{fix.description}</p>
-                          <p className="text-sm text-gray-700 mt-2">{fix.reasoning}</p>
-                          {fix.rule_citation && (
-                            <p className="text-xs text-gray-600 mt-2 italic">
-                              Citation: {fix.rule_citation}
-                            </p>
-                          )}
-                          <div className="mt-2">
-                            <p className="text-xs font-semibold text-gray-600">Patches:</p>
-                            <pre className="bg-white p-2 rounded-xl text-xs mt-1 overflow-x-auto border border-gray-200">
-                              {JSON.stringify(fix.patches, null, 2)}
-                            </pre>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
+                  </div>
                 )}
-
-                {/* Payer Decision */}
-                <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-gray-900">5. Payer Decision</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div
-                      className={`p-6 rounded-2xl border ${
-                        workflow.payerDecision.decision === 'approved'
-                          ? 'bg-green-50 border-green-300'
-                          : 'bg-red-50 border-red-300'
-                      }`}
-                    >
-                      <p className="text-2xl font-bold mb-2 uppercase tracking-wide">
-                        {workflow.payerDecision.decision === 'approved' ? 'APPROVED' : 'DENIED'}
-                      </p>
-                      <p className="text-lg mb-2">Claim ID: {workflow.payerDecision.claim_id}</p>
-                      <p className="text-sm text-gray-700 mb-2">Reason: {workflow.payerDecision.reason}</p>
-                      {workflow.payerDecision.amount_approved && (
-                        <p className="text-xl font-bold text-green-700 mt-4">
-                          Amount Approved: ${workflow.payerDecision.amount_approved.toFixed(2)}
-                        </p>
-                      )}
-                      {workflow.payerDecision.reason_codes && (
-                        <div className="mt-4">
-                          <p className="text-sm font-semibold">Reason Codes:</p>
-                          <p className="text-sm">{workflow.payerDecision.reason_codes.join(', ')}</p>
-                        </div>
-                      )}
-                      {workflow.payerDecision.pdf_url && (
-                        <div className="mt-6 pt-4 border-t border-gray-300">
-                          <Button asChild size="lg" className="w-full">
-                            <a
-                              href={workflow.payerDecision.pdf_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center justify-center gap-2"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                              </svg>
-                              Download CMS 1500 Form
-                            </a>
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Problem Section */}
+      <div className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              The Hidden Cost of Post-Procedure Billing
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Manual, fragmented, and expensive — current billing processes are unsustainable
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 bg-red-100 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900">$172</div>
+                    <div className="text-sm text-gray-600">per bill in the U.S.</div>
+                  </div>
+                </div>
+                <p className="text-gray-700">
+                  Coding & billing administrative processes cost over <strong>$172 per bill</strong>.
+                  <a 
+                    href="https://med.stanford.edu/news/all-news/2022/08/study-lower-us-billing-costs.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 block mt-2 underline"
+                  >
+                    — Stanford Medicine Study
+                  </a>
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900">30%</div>
+                    <div className="text-sm text-gray-600">of healthcare costs</div>
+                  </div>
+                </div>
+                <p className="text-gray-700">
+                  Administrative/billing costs account for approximately <strong>30% of U.S. healthcare costs</strong>.
+                  <a 
+                    href="https://med.stanford.edu/news/all-news/2022/08/study-lower-us-billing-costs.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 block mt-2 underline"
+                  >
+                    — Stanford Medicine Study
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Pain Points</h3>
+              <div className="space-y-4">
+                {[
+                  'Manual de-identification & review processes',
+                  'Coders reading free-text notes, selecting CPT codes manually',
+                  'Drafting claims in Excel templates',
+                  'High error/denial rates, slow reimbursement cycles',
+                  'Diverts skilled staff from higher-value work',
+                ].map((point, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5">
+                      <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-700 flex-1">{point}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Market Opportunity Section */}
+      <div className="py-16 bg-blue-50 border-y border-blue-100">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Market Opportunity</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Every U.S. hospital and clinic deals with post-procedure billing. With per-bill costs of ~$172 
+              and billing service fees of 4–10% of revenue, <strong>tens of billions of dollars are at stake</strong>.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="text-2xl font-bold text-gray-900 mb-2">4–10%</div>
+              <div className="text-sm text-gray-600 mb-2">Billing service fees of revenue</div>
+              <a 
+                href="https://bestmedicalbilling.com/blogs/medical-billing-services-cost-pricing" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                Source: Best Medical Billing
+              </a>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="text-2xl font-bold text-gray-900 mb-2">11.5%</div>
+              <div className="text-sm text-gray-600 mb-2">Annual growth through 2030</div>
+              <a 
+                href="https://carecloud.com/cost-of-medical-billing-services" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                Source: CareCloud
+              </a>
+            </div>
+          </div>
+          <p className="text-center text-sm text-gray-600 mt-6 max-w-2xl mx-auto">
+            Complexity from new CPT codes and digital health services only magnifies the need for automation.
+          </p>
+        </div>
+      </div>
+
+      {/* Solution Section */}
+      <div className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Our Solution: AI Agent for CPT & Claim Drafting
+            </h2>
+            <p className="text-2xl text-gray-600 mb-2">One Agent. Three Steps.</p>
+            <p className="text-lg text-gray-500">
+              Fully automated end-to-end workflow with HIPAA-compliant local de-identification
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {[
+              {
+                step: 1,
+                title: 'De-Identify Locally',
+                description: 'HIPAA-compliant local de-identification removes PHI before any remote processing, ensuring complete patient privacy.',
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                ),
+                bgColor: 'bg-blue-100',
+                textColor: 'text-blue-600',
+                stepBg: 'bg-blue-600'
+              },
+              {
+                step: 2,
+                title: 'AI Codes & Maps',
+                description: 'AI reads unstructured notes, understands clinical context, and proposes all relevant CPT codes with confidence scores.',
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                ),
+                bgColor: 'bg-purple-100',
+                textColor: 'text-purple-600',
+                stepBg: 'bg-purple-600'
+              },
+              {
+                step: 3,
+                title: 'Draft Claim Automatically',
+                description: 'AI drafts the complete CMS-1500 claim submission text for insurance, ready for review and submission.',
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ),
+                bgColor: 'bg-green-100',
+                textColor: 'text-green-600',
+                stepBg: 'bg-green-600'
+              }
+            ].map((item) => (
+              <div key={item.step} className="relative">
+                <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className={`w-16 h-16 ${item.bgColor} rounded-xl flex items-center justify-center ${item.textColor} mb-6`}>
+                    {item.icon}
+                  </div>
+                  <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full ${item.stepBg} text-white font-bold text-lg mb-4`}>
+                    {item.step}
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                </div>
+                {item.step < 3 && (
+                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
+                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white text-center shadow-xl">
+            <p className="text-xl mb-4">
+              <strong>Result:</strong> Fewer hours, fewer errors, faster reimbursement — 
+              with complete transparency and auditability.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* HIPAA Compliance Section */}
+      <div className="py-16 bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 border-y border-green-100">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full text-sm font-semibold text-green-800 mb-4">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>HIPAA Compliant</span>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Your Patient Data is Protected
+              </h2>
+              <p className="text-lg text-gray-700 mb-4">
+                We understand that patient privacy is paramount. Our platform ensures complete HIPAA compliance 
+                through local de-identification before any processing occurs.
+              </p>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span><strong>Local Processing:</strong> PHI is de-identified on your system before any data leaves your control</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span><strong>Zero Exposure:</strong> Sensitive patient information never reaches our servers</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span><strong>Compliance Built-In:</strong> Our de-identification process meets all HIPAA requirements</span>
+                </li>
+              </ul>
+            </div>
+            <div className="bg-white rounded-2xl p-8 border-2 border-green-200 shadow-xl">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Secure by Design</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  Patient data security isn't an afterthought—it's the foundation of our platform. 
+                  We protect your sensitive information with industry-leading privacy practices.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Team & Traction Section */}
+      <div className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Team & Traction</h2>
+            <p className="text-xl text-gray-600">
+              Healthcare AI expertise meets billing domain knowledge
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-white rounded-2xl p-8 border-2 border-blue-200 shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">AI Engineer</h3>
+              <p className="text-lg text-gray-700 font-semibold mb-2">Healthcare AI Specialist</p>
+              <p className="text-gray-600">
+                Extensive experience building clinical AI systems at top-tier health systems. 
+                Deep expertise in healthcare data, workflows, and AI integration.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Revenue Cycle Expert</h3>
+              <p className="text-lg text-gray-700 font-semibold mb-2">Billing & RCM Specialist</p>
+              <p className="text-gray-600">
+                Deep revenue cycle management experience with proven track record in hospital billing operations, 
+                claim processing, and payer relationships.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8">
+            <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Early Traction
+            </h4>
+            <p className="text-gray-700 leading-relaxed">
+              We've built a working prototype that performs PHI de-identification and CPT extraction for specific procedure types. 
+              <strong className="text-green-800"> Positive feedback from billing staff at UCLA Health</strong> validates our approach 
+              and confirms the real-world need for this solution.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Why Now Section */}
+      <div className="py-16 bg-indigo-50 border-y border-indigo-100">
+        <div className="max-w-4xl mx-auto px-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Now?</h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="text-4xl mb-3">🧠</div>
+              <h4 className="font-bold text-gray-900 mb-2">AI Maturity</h4>
+              <p className="text-sm text-gray-600">
+                LLMs + agent frameworks now capable of reliable note-to-code automation
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="text-4xl mb-3">📈</div>
+              <h4 className="font-bold text-gray-900 mb-2">Code Explosion</h4>
+              <p className="text-sm text-gray-600">
+                New CPT/Category III codes for digital medicine & AI services
+                <a 
+                  href="https://humanmedicalbilling.com/blog/us-medical-billing-2025-fees-prior-auth-nsa-practical-rcm-playbook" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block text-xs text-blue-600 mt-2 underline"
+                >
+                  Source
+                </a>
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="text-4xl mb-3">🏥</div>
+              <h4 className="font-bold text-gray-900 mb-2">Hospital Pressure</h4>
+              <p className="text-sm text-gray-600">
+                Shrinking reimbursements, staff shortages, rising admin costs create perfect timing
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Financial Impact Section */}
+      <div className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-12 border-2 border-green-200 shadow-xl">
+            <div className="max-w-3xl mx-auto text-center mb-8">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Financial Impact</h3>
+              <p className="text-lg text-gray-700 mb-8">
+                <strong>If manual billing costs ~$172 per bill</strong> and our agent cuts that by 50%, 
+                hospitals save <strong className="text-green-700">~$86 per case</strong>.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-8 border-2 border-green-300 shadow-lg max-w-2xl mx-auto">
+              <div className="text-center mb-6">
+                <div className="text-5xl font-bold text-green-700 mb-2">$860K</div>
+                <div className="text-lg text-gray-700 mb-4">Annual savings for a 500-bed hospital</div>
+                <div className="text-sm text-gray-600">
+                  (Processing 10,000 post-procedure bills yearly)
+                </div>
+              </div>
+              <div className="border-t border-gray-200 pt-6">
+                <p className="text-center text-gray-700">
+                  <strong>That's huge ROI</strong> — and our SaaS margins are highly scalable 
+                  with <strong className="text-green-700">&lt;30% incremental cost per claim</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Closing CTA */}
+      <div className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 rounded-2xl p-12 text-white text-center shadow-2xl">
+            <h3 className="text-4xl font-bold mb-6">Let's Reinvent Post-Procedure Billing Together</h3>
+            <p className="text-xl text-blue-100 mb-2 max-w-3xl mx-auto leading-relaxed">
+              Billing inefficiency is one of healthcare's largest hidden drains — but it's fixable.
+            </p>
+            <p className="text-lg text-blue-200 mb-8 max-w-2xl mx-auto">
+              With domain expertise and AI engineering, we can make billing invisible — 
+              letting clinicians focus on care, not codes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-white text-blue-900 hover:bg-blue-50 text-lg px-8 py-6 rounded-xl font-semibold shadow-xl"
+                onClick={() => {
+                  document.getElementById('demo-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Try Live Demo
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="bg-transparent border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 rounded-xl font-semibold"
+              >
+                Schedule a Meeting
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-300 py-12">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h4 className="text-white font-bold text-lg mb-4">ClaimSense AI</h4>
+              <p className="text-sm">
+                Automating CPT coding and claims drafting with AI. From procedure to reimbursement — streamlined.
+              </p>
+            </div>
+            <div>
+              <h5 className="text-white font-semibold mb-3">Product</h5>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white transition">Features</a></li>
+                <li><a href="#" className="hover:text-white transition">Demo</a></li>
+                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition">Security</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="text-white font-semibold mb-3">Company</h5>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white transition">About</a></li>
+                <li><a href="#" className="hover:text-white transition">Team</a></li>
+                <li><a href="#" className="hover:text-white transition">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="text-white font-semibold mb-3">Resources</h5>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white transition">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition">Case Studies</a></li>
+                <li><a href="#" className="hover:text-white transition">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition">Support</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-sm">
+            <p>&copy; 2024 ClaimSense AI. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
