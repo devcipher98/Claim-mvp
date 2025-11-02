@@ -102,22 +102,6 @@ export default function NotesPage() {
   const [processorStatus, setProcessorStatus] = useState<ProcessorStatus | null>(null);
   const [liveProgress, setLiveProgress] = useState<Map<string, any>>(new Map());
 
-  // Load notes on mount and refresh every 5 seconds
-  useEffect(() => {
-    console.log('📋 Notes page loaded - Auto-refresh every 5 seconds');
-    console.log('💡 TIP: Open browser console to see detailed processing logs');
-    
-    loadNotes();
-    loadProcessorStatus();
-    initializeProcessors();
-    
-    const interval = setInterval(() => {
-      loadNotes();
-      loadProcessorStatus();
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
 
   const initializeProcessors = async () => {
     try {
@@ -269,6 +253,178 @@ export default function NotesPage() {
       setIsUploading(false);
     }
   };
+
+  const handleBatchUploadFromStorage = async (filesDataJson: string, count: number) => {
+    try {
+      const filesData = JSON.parse(filesDataJson);
+      
+      if (!Array.isArray(filesData) || filesData.length === 0) {
+        console.error('Invalid batch upload data');
+        return;
+      }
+
+      setIsUploading(true);
+      setError('');
+      
+      console.log(`📦 Starting batch upload of ${filesData.length} files...`);
+
+      // Upload files sequentially to avoid overwhelming the server
+      for (let i = 0; i < filesData.length; i++) {
+        const fileData = filesData[i];
+        
+        try {
+          // Convert base64 to Blob
+          const binaryString = atob(fileData.data);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let j = 0; j < binaryString.length; j++) {
+            bytes[j] = binaryString.charCodeAt(j);
+          }
+          const blob = new Blob([bytes], { type: fileData.type || 'text/plain' });
+          const file = new File([blob], fileData.name, { type: fileData.type || 'text/plain' });
+
+          console.log(`📤 Uploading ${i + 1}/${filesData.length}: ${file.name}`);
+
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch('/api/notes/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            console.error(`❌ Failed to upload ${file.name}:`, result.error?.message);
+            continue;
+          }
+
+          console.log(`✅ Uploaded ${i + 1}/${filesData.length}: ${file.name} (ID: ${result.data.id})`);
+          
+          // Connect to progress stream for this note
+          connectToProgressStream(result.data.id);
+
+          // Small delay between uploads to avoid overwhelming the server
+          if (i < filesData.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (err: any) {
+          console.error(`❌ Error uploading ${fileData.name}:`, err);
+        }
+      }
+
+      console.log(`✅ Batch upload complete: ${filesData.length} files processed`);
+      
+      // Reload notes to show all uploaded files
+      await loadNotes();
+    } catch (err: any) {
+      console.error('❌ Batch upload error:', err);
+      setError(`Batch upload failed: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleBatchUploadFromStorage = async (filesDataJson: string, count: number) => {
+    try {
+      const filesData = JSON.parse(filesDataJson);
+      
+      if (!Array.isArray(filesData) || filesData.length === 0) {
+        console.error('Invalid batch upload data');
+        return;
+      }
+
+      setIsUploading(true);
+      setError('');
+      
+      console.log(`📦 Starting batch upload of ${filesData.length} files...`);
+
+      // Upload files sequentially to avoid overwhelming the server
+      for (let i = 0; i < filesData.length; i++) {
+        const fileData = filesData[i];
+        
+        try {
+          // Convert base64 to Blob
+          const binaryString = atob(fileData.data);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let j = 0; j < binaryString.length; j++) {
+            bytes[j] = binaryString.charCodeAt(j);
+          }
+          const blob = new Blob([bytes], { type: fileData.type || 'text/plain' });
+          const file = new File([blob], fileData.name, { type: fileData.type || 'text/plain' });
+
+          console.log(`📤 Uploading ${i + 1}/${filesData.length}: ${file.name}`);
+
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch('/api/notes/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (!result.success) {
+            console.error(`❌ Failed to upload ${file.name}:`, result.error?.message);
+            continue;
+          }
+
+          console.log(`✅ Uploaded ${i + 1}/${filesData.length}: ${file.name} (ID: ${result.data.id})`);
+          
+          // Connect to progress stream for this note
+          connectToProgressStream(result.data.id);
+
+          // Small delay between uploads to avoid overwhelming the server
+          if (i < filesData.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (err: any) {
+          console.error(`❌ Error uploading ${fileData.name}:`, err);
+        }
+      }
+
+      console.log(`✅ Batch upload complete: ${filesData.length} files processed`);
+      
+      // Reload notes to show all uploaded files
+      await loadNotes();
+    } catch (err: any) {
+      console.error('❌ Batch upload error:', err);
+      setError(`Batch upload failed: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Load notes on mount and refresh every 5 seconds
+  useEffect(() => {
+    console.log('📋 Notes page loaded - Auto-refresh every 5 seconds');
+    console.log('💡 TIP: Open browser console to see detailed processing logs');
+    
+    loadNotes();
+    loadProcessorStatus();
+    initializeProcessors();
+    
+    // Check for batch upload files from home page
+    const batchFilesData = sessionStorage.getItem('batchUploadFiles');
+    const batchCount = sessionStorage.getItem('batchUploadCount');
+    
+    if (batchFilesData && batchCount) {
+      console.log(`📦 Processing ${batchCount} files from batch upload`);
+      handleBatchUploadFromStorage(batchFilesData, parseInt(batchCount));
+      // Clear sessionStorage after reading
+      sessionStorage.removeItem('batchUploadFiles');
+      sessionStorage.removeItem('batchUploadCount');
+    }
+    
+    const interval = setInterval(() => {
+      loadNotes();
+      loadProcessorStatus();
+    }, 5000);
+    
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getStatusBadge = (status: Note['status']) => {
     const styles = {

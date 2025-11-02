@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { processCompleteWorkflow } from './lib/api-client';
 import demoClaimsData from '@/data/demo_claims.json';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
@@ -20,6 +21,7 @@ export default function Home() {
   const [currentStep, setCurrentStep] = useState(0);
   const [processingSteps, setProcessingSteps] = useState<any[]>([]);
   const [fileUploaded, setFileUploaded] = useState(false);
+  const router = useRouter();
 
   // Safely handle demo claims data
   let demoClaims: any[] = [];
@@ -110,6 +112,68 @@ export default function Home() {
     } catch (err) {
       setError('Failed to read file. Please try a different file or copy-paste the content.');
       console.error('File read error:', err);
+    }
+  };
+
+  const handleBatchUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const validExtensions = ['.txt', '.json', '.pdf', '.md', '.doc', '.docx', '.rtf'];
+    const validFiles: File[] = [];
+
+    // Validate all files
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileName = file.name.toLowerCase();
+      const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+
+      if (!hasValidExtension) {
+        setError(`File "${file.name}" has an invalid extension. Skipping...`);
+        continue;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        setError(`File "${file.name}" is too large (max 5MB). Skipping...`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) {
+      setError('No valid files selected');
+      return;
+    }
+
+    // Store files in sessionStorage as base64 for transfer
+    try {
+      const filesData = await Promise.all(
+        validFiles.map(async (file) => {
+          const arrayBuffer = await file.arrayBuffer();
+          const base64 = btoa(
+            new Uint8Array(arrayBuffer).reduce(
+              (data, byte) => data + String.fromCharCode(byte),
+              ''
+            )
+          );
+          return {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            data: base64,
+          };
+        })
+      );
+
+      sessionStorage.setItem('batchUploadFiles', JSON.stringify(filesData));
+      sessionStorage.setItem('batchUploadCount', validFiles.length.toString());
+      
+      // Redirect to notes page
+      router.push('/notes');
+    } catch (err) {
+      setError('Failed to process files. Please try again.');
+      console.error('Batch upload error:', err);
     }
   };
 
@@ -287,7 +351,7 @@ export default function Home() {
                 </CardDescription>
                         </div>
               </div>
-              <div>
+              <div className="flex gap-2">
                 <Input
                   id="file-upload"
                   type="file"
@@ -312,6 +376,33 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                     Upload
+                  </Button>
+                </Label>
+                <Input
+                  id="batch-upload"
+                  type="file"
+                  accept=".txt,.json,.pdf,.md,.doc,.docx,.rtf,text/*"
+                  onChange={handleBatchUpload}
+                  disabled={isProcessing}
+                  multiple
+                  className="hidden"
+                />
+                <Label htmlFor="batch-upload" className="cursor-pointer">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    type="button" 
+                    disabled={isProcessing}
+                    className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 hover:text-white h-8 text-xs px-3"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('batch-upload')?.click();
+                    }}
+                  >
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Batch Upload
                   </Button>
                 </Label>
               </div>
@@ -502,7 +593,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:text-blue-800 block mt-2 underline"
                   >
-                    — Stanford Medicine Study
+                    Stanford Medicine Study
                   </a>
                 </p>
               </div>
@@ -527,7 +618,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:text-blue-800 block mt-2 underline"
                   >
-                    — Stanford Medicine Study
+                    Stanford Medicine Study
                   </a>
                 </p>
               </div>
