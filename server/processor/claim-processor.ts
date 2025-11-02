@@ -138,16 +138,40 @@ async function processSingleNote(noteId: string, retryCount = 0): Promise<void> 
   });
 
   try {
-    // Run the agentic workflow
+    // Send progress updates
+    const { sendProgressUpdate } = await import('@/pages/api/processor/progress');
+    
+    sendProgressUpdate(noteId, 1, 5, 'Initializing AI workflow and analyzing note structure', 'processing');
+    
+    // Run the agentic workflow with timeout
     console.log(`🤖 Running agentic workflow for note ${noteId}`);
-    const agentResult = await runAgenticWorkflowWithMetorial(
-      'Process this clinician note into a complete, validated, and approved claim',
-      { clinician_note: note.content }
+    
+    // Create a timeout promise
+    const timeoutMs = 120000; // 2 minutes timeout
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Processing timeout - took longer than 2 minutes')), timeoutMs)
     );
+    
+    sendProgressUpdate(noteId, 2, 5, 'Extracting diagnoses, procedures, and patient information', 'processing');
+    
+    // Race between processing and timeout
+    const agentResult = await Promise.race([
+      runAgenticWorkflowWithMetorial(
+        'Process this clinician note into a complete, validated, and approved claim',
+        { clinician_note: note.content }
+      ),
+      timeoutPromise
+    ]) as any;
 
     if (!agentResult.success) {
+      sendProgressUpdate(noteId, 5, 5, 'Processing failed', 'error');
       throw new Error(`Agent workflow failed: ${agentResult.final_result?.error || 'Unknown error'}`);
     }
+    
+    sendProgressUpdate(noteId, 3, 5, 'Mapping medical codes and checking NCCI compliance', 'processing');
+    sendProgressUpdate(noteId, 4, 5, 'Validating claim data and generating CMS 1500 form', 'processing');
+    
+    console.log(`✅ Agent workflow completed for note ${noteId}`);
 
     // Extract the final result
     const finalResult = agentResult.final_result;
@@ -191,6 +215,9 @@ async function processSingleNote(noteId: string, retryCount = 0): Promise<void> 
     claimsStore.push(claimRecord);
     saveClaimsToDisk();
 
+    // Send final progress update
+    sendProgressUpdate(noteId, 5, 5, 'Claim processing complete! CMS 1500 form generated and ready', 'completed');
+    
     // Update note status to completed
     updateNoteStatus(noteId, 'completed', {
       claim_id: claimId,

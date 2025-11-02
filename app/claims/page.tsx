@@ -46,20 +46,14 @@ export default function ClaimsPage() {
 
   const getDecisionBadge = (decision: ClaimRecord['decision']) => {
     const styles = {
-      approved: 'bg-green-100 text-green-800 border-green-300',
-      denied: 'bg-red-100 text-red-800 border-red-300',
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    };
-
-    const icons = {
-      approved: '✅',
-      denied: '❌',
-      pending: '⏳',
+      approved: 'bg-green-50 text-green-700 border-green-300',
+      denied: 'bg-red-50 text-red-700 border-red-300',
+      pending: 'bg-amber-50 text-amber-700 border-amber-300',
     };
 
     return (
-      <span className={`px-4 py-2 rounded-full text-sm font-bold border-2 ${styles[decision]}`}>
-        {icons[decision]} {decision.toUpperCase()}
+      <span className={`px-4 py-2 rounded-full text-sm font-semibold border uppercase tracking-wide ${styles[decision]}`}>
+        {decision}
       </span>
     );
   };
@@ -82,7 +76,7 @@ export default function ClaimsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                📑 Generated Claims
+                Claims Management
               </h1>
               <p className="text-xl text-gray-600">
                 View and download all processed claim PDFs
@@ -91,13 +85,13 @@ export default function ClaimsPage() {
             <div className="flex gap-3">
               <a
                 href="/notes"
-                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+                className="inline-flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-xl shadow hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
               >
-                ← Back to Notes
+                Back to Notes
               </a>
               <a
                 href="/"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
               >
                 Home
               </a>
@@ -107,84 +101,84 @@ export default function ClaimsPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
-            <p className="text-sm text-gray-600 font-medium">Total Claims</p>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+            <p className="text-sm text-gray-600 font-medium mb-2">Total Claims</p>
             <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-green-500">
-            <p className="text-sm text-gray-600 font-medium">Approved</p>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+            <p className="text-sm text-gray-600 font-medium mb-2">Approved</p>
             <p className="text-3xl font-bold text-green-600">{stats.approved}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-red-500">
-            <p className="text-sm text-gray-600 font-medium">Denied</p>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+            <p className="text-sm text-gray-600 font-medium mb-2">Denied</p>
             <p className="text-3xl font-bold text-red-600">{stats.denied}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-yellow-500">
-            <p className="text-sm text-gray-600 font-medium">Pending</p>
-            <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+            <p className="text-sm text-gray-600 font-medium mb-2">Pending</p>
+            <p className="text-3xl font-bold text-amber-600">{stats.pending}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500">
-            <p className="text-sm text-gray-600 font-medium">Total Approved $</p>
-            <p className="text-2xl font-bold text-purple-600">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+            <p className="text-sm text-gray-600 font-medium mb-2">Total Approved</p>
+            <p className="text-2xl font-bold text-blue-600">
               ${stats.totalApproved.toFixed(2)}
             </p>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-6">
           <div className="flex gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 filter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >
               All ({stats.total})
             </button>
             <button
               onClick={() => setFilter('approved')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 filter === 'approved'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-green-600 text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >
               Approved ({stats.approved})
             </button>
             <button
               onClick={() => setFilter('denied')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 filter === 'denied'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >
               Denied ({stats.denied})
             </button>
             <button
               onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 filter === 'pending'
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >
               Pending ({stats.pending})
             </button>
             <button
               onClick={loadClaims}
-              className="ml-auto px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium"
+              className="ml-auto px-5 py-2.5 rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 font-semibold transition-all duration-200 active:scale-[0.98]"
             >
-              🔄 Refresh
+              Refresh
             </button>
           </div>
         </div>
 
         {/* Claims List */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
@@ -204,7 +198,7 @@ export default function ClaimsPage() {
               {filteredClaims.map((claim) => (
                 <div
                   key={claim.claim_id}
-                  className="border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
+                  className="border border-gray-200 rounded-2xl p-6 hover:shadow-md hover:border-gray-300 transition-all duration-200"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -241,8 +235,8 @@ export default function ClaimsPage() {
                       </div>
 
                       {claim.amount_approved && (
-                        <div className="bg-green-50 rounded-lg p-3 mb-3 border border-green-200">
-                          <p className="text-sm text-green-700 font-medium">Amount Approved:</p>
+                        <div className="bg-green-50 rounded-2xl p-4 mb-3 border border-green-200">
+                          <p className="text-sm text-green-700 font-medium mb-1">Amount Approved</p>
                           <p className="text-2xl font-bold text-green-700">
                             ${claim.amount_approved.toFixed(2)}
                           </p>
@@ -250,8 +244,8 @@ export default function ClaimsPage() {
                       )}
 
                       {claim.reason && (
-                        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                          <p className="text-sm text-gray-600">Reason:</p>
+                        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                          <p className="text-sm text-gray-600 font-medium mb-1">Reason</p>
                           <p className="text-sm text-gray-800">{claim.reason}</p>
                         </div>
                       )}
@@ -262,16 +256,16 @@ export default function ClaimsPage() {
                         href={claim.pdf_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+                        className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow hover:shadow-lg active:scale-[0.98]"
                       >
-                        📄 View PDF
+                        View PDF
                       </a>
                       <a
                         href={claim.pdf_url}
                         download
-                        className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+                        className="inline-flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow hover:shadow-lg active:scale-[0.98]"
                       >
-                        ⬇️ Download
+                        Download
                       </a>
                     </div>
                   </div>
