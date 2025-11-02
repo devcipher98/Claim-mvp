@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { APIResponse, PayerResponse, ClaimSchema } from '@/types';
 import { validateClaim } from '@/server/validation/validate_claim';
+import { generateCMS1500PDF } from '@/server/pdf/generate_cms1500';
 
 export default async function handler(
   req: NextApiRequest,
@@ -72,6 +73,16 @@ export default async function handler(
       );
     }
     
+    // Generate CMS 1500 PDF
+    let pdfUrl: string | undefined;
+    try {
+      pdfUrl = await generateCMS1500PDF(schemaValidation.data, claimId);
+      console.log(`✅ Generated CMS 1500 PDF: ${pdfUrl}`);
+    } catch (pdfError) {
+      console.error('Failed to generate PDF:', pdfError);
+      // Continue without PDF if generation fails
+    }
+    
     const payerResponse: PayerResponse = {
       decision,
       claim_id: claimId,
@@ -79,6 +90,7 @@ export default async function handler(
       reason,
       reason_codes: reasonCodes.length > 0 ? reasonCodes : undefined,
       amount_approved: decision === 'approved' ? amountApproved : undefined,
+      pdf_url: pdfUrl,
     };
     
     return res.status(200).json({

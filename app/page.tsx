@@ -122,6 +122,20 @@ export default function Home() {
           <p className="text-xl text-gray-600">
             Healthcare billing assistant with AI-powered claim validation and fixing
           </p>
+          <div className="flex gap-4 justify-center mt-4">
+            <a
+              href="/notes"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+            >
+              📋 Upload Notes (Auto-Process)
+            </a>
+            <a
+              href="/claims"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+            >
+              📑 View Generated Claims
+            </a>
+          </div>
         </div>
 
         {/* Demo Selector */}
@@ -302,6 +316,26 @@ export default function Home() {
                     <pre className="bg-white p-4 rounded overflow-x-auto text-sm">
                       {JSON.stringify(workflow.final_result, null, 2)}
                     </pre>
+                    
+                    {/* PDF Download Link */}
+                    {workflow.final_result?.pdf_url && (
+                      <div className="mt-4 pt-4 border-t border-green-300">
+                        <a
+                          href={workflow.final_result.pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          Download CMS 1500 Form (PDF)
+                        </a>
+                        <p className="text-xs text-gray-600 mt-2">
+                          📋 This form is pre-filled with your claim information and ready for submission.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -444,6 +478,24 @@ export default function Home() {
                   <div className="mt-4">
                     <p className="text-sm font-semibold">Reason Codes:</p>
                     <p className="text-sm">{workflow.payerDecision.reason_codes.join(', ')}</p>
+                  </div>
+                )}
+                {workflow.payerDecision.pdf_url && (
+                  <div className="mt-6 pt-4 border-t border-gray-300">
+                    <a
+                      href={workflow.payerDecision.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      Download CMS 1500 Form (PDF)
+                    </a>
+                    <p className="text-xs text-gray-600 mt-2">
+                      📋 This form is pre-filled with your claim information and ready for submission.
+                    </p>
                   </div>
                 )}
               </div>

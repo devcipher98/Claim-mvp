@@ -1429,5 +1429,57 @@
       ]
     },
     "actor": "system"
+  },
+  {
+    "id": "log_1762082444393_nbhi1qsv9",
+    "timestamp": "2025-11-02T11:20:44.393Z",
+    "action": "Extracted entities from clinician note",
+    "details": {
+      "procedure_name": "office visit",
+      "diagnosis_text": "diabetes management",
+      "body_site": "right knee",
+      "visit_complexity": "high complexity",
+      "patient_type": "established",
+      "additional_procedures": [
+        "HbA1c order",
+        "comprehensive metabolic panel order",
+        "physical therapy",
+        "NSAIDs",
+        "right knee x-ray 2 views",
+        "lipid panel order"
+      ],
+      "additional_diagnoses": [
+        "right knee pain",
+        "Type 2 Diabetes Mellitus",
+        "hypertension",
+        "hyperlipidemia"
+      ]
+    },
+    "actor": "system"
+  },
+  {
+    "id": "log_1762083388919_cdbinzako",
+    "timestamp": "2025-11-02T11:36:28.919Z",
+    "action": "Extracted entities from clinician note",
+    "details": {
+      "procedure_name": "office visit",
+      "diagnosis_text": "diabetes management",
+      "body_site": "right knee",
+      "visit_complexity": "high complexity",
+      "patient_type": "established",
+      "additional_procedures": [
+        "HbA1c order",
+        "comprehensive metabolic panel order",
+        "right knee x-ray 2 views",
+        "physical therapy"
+      ],
+      "additional_diagnoses": [
+        "right knee pain",
+        "Type 2 Diabetes Mellitus",
+        "Hypertension",
+        "Hyperlipidemia"
+      ]
+    },
+    "actor": "system"
   }
 ]

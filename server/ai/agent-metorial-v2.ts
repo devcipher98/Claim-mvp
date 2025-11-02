@@ -124,11 +124,30 @@ export async function runAgenticWorkflowWithMetorial(
               // Check if this was submit_claim
               if (toolCall.function.name === 'submit_claim') {
                 try {
-                  const result = JSON.parse(toolResponse.content);
-                  finalResult = result;
+                  // Tool response format: { content: [{ type: 'text', text: '...' }] }
+                  let responseText = typeof toolResponse.content === 'string' 
+                    ? toolResponse.content 
+                    : toolResponse.content[0]?.text || JSON.stringify(toolResponse.content);
+                  
+                  console.log('📄 submit_claim raw response:', JSON.stringify(toolResponse).substring(0, 500));
+                  
+                  // Parse the outer JSON
+                  let parsed = JSON.parse(responseText);
+                  
+                  // If it's still wrapped in { content: [...] }, extract the text
+                  if (parsed.content && Array.isArray(parsed.content)) {
+                    responseText = parsed.content[0]?.text || responseText;
+                    parsed = JSON.parse(responseText);
+                  }
+                  
+                  // Extract the actual data from the API response
+                  finalResult = parsed.data || parsed;
+                  
+                  console.log('📄 Final result extracted:', JSON.stringify(finalResult, null, 2));
                   continueLoop = false;
                 } catch (e) {
-                  finalResult = { message: toolResponse.content };
+                  console.error('Error parsing submit_claim response:', e);
+                  finalResult = { message: 'Claim submitted', raw: toolResponse.content };
                   continueLoop = false;
                 }
               }

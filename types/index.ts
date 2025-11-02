@@ -164,6 +164,7 @@ export interface PayerResponse {
   reason?: string;
   reason_codes?: string[];
   amount_approved?: number;
+  pdf_url?: string; // URL to the generated CMS 1500 PDF
 }
 
 // ============================================================================
@@ -211,6 +212,39 @@ export interface UnsiloedResponse {
   citations: UnsiloedCitation[];
   query: string;
   timestamp: string;
+}
+
+// ============================================================================
+// Note Processing Types
+// ============================================================================
+
+export type NoteProcessingStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface Note {
+  id: string;
+  filename: string;
+  content: string;
+  uploaded_at: string;
+  status: NoteProcessingStatus;
+  claim_id?: string;
+  pdf_url?: string;
+  error?: string;
+  processing_started_at?: string;
+  processing_completed_at?: string;
+}
+
+export interface ClaimRecord {
+  claim_id: string;
+  note_id: string;
+  note_filename: string;
+  pdf_url: string;
+  decision: PayerDecision;
+  amount_approved?: number;
+  reason?: string;
+  created_at: string;
+  patient_name?: string;
+  provider_name?: string;
+  claim_data?: Claim;
 }
 
 // ============================================================================

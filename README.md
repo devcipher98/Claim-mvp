@@ -10,6 +10,7 @@ ClaimSense reduces claim denials by validating and fixing claims before submissi
 - **Rule-based validation** with NCCI edits and CMS guidelines
 - **AI reasoning for fixes** with policy citations from Unsiloed AI
 - **Metorial MCP integration** for agentic workflow orchestration
+- **🆕 Automated parallel processing** with continuous monitoring and PDF generation
 
 ## 🚀 Quick Start
 
@@ -35,6 +36,24 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### 🆕 New: Automated Claim Processing
+
+ClaimSense now includes an **automated processing system** that continuously monitors for new notes and processes them in parallel:
+
+1. **Upload Notes**: Visit `/notes` to upload clinician notes (.txt files)
+2. **Auto-Processing**: Background workers automatically process notes into validated claims
+3. **PDF Generation**: Each claim gets a CMS 1500 PDF form
+4. **View Claims**: Visit `/claims` to see all generated claims and download PDFs
+
+**Key Features:**
+- 🔄 Continuous monitoring with file system watcher
+- ⚡ Parallel processing (up to 3 simultaneous)
+- 📊 Real-time status updates
+- 📄 Automatic PDF generation
+- 🎯 Complete end-to-end automation
+
+See [AUTO_PROCESSING_GUIDE.md](./AUTO_PROCESSING_GUIDE.md) for detailed documentation.
 
 ### Running the MCP Server
 
